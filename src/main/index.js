@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow ,Tray,Menu,ipcMain} from 'electron'
 
 /**
  * Set `__static` path to static files in production
@@ -20,15 +20,40 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     height: 563,
     useContentSize: true,
-    width: 1000
+    width: 1000,
+    webPreferences: {webSecurity: false},
+  //  ' hidden-inset':true
+
   })
 
   mainWindow.loadURL(winURL)
-
+  createTray()
   mainWindow.on('closed', () => {
     mainWindow = null
   })
 }
+
+
+let tray
+function createTray () {
+  ipcMain.on('set-title',(event ,arg)=>{
+    tray.setTitle(`${arg}`);
+    })
+  const menubarPic = process.platform === 'darwin' ? `${__static}/tuboshu.png` : `${__static}/toboshu.png`
+  tray = new Tray(menubarPic) // 指定图片的路径
+  mainWindow.hide()
+  var contextMenu = Menu.buildFromTemplate([
+    { label: 'Item1', type: 'radio' },
+    { label: 'Item2', type: 'radio' },
+    { label: 'Item3', type: 'radio', checked: true },
+    { label: 'Item4', type: 'radio' }
+  ]);
+  tray.setContextMenu(contextMenu);
+  tray.on('click',()=>{
+
+  })
+}
+
 
 app.on('ready', createWindow)
 
